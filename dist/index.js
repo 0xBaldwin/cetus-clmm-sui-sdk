@@ -5923,11 +5923,19 @@ var PositionModule = class {
       primaryCoinAInput,
       primaryCoinBInput
     ];
-    tx.moveCall({
-      target: `${integrate.published_at}::${ClmmIntegratePoolV2Module}::collect_fee`,
-      typeArguments,
-      arguments: args
-    });
+    if (this.sdk.packageOveride) {
+      tx.moveCall({
+        target: `${this.sdk.packageOveride}::cetus::collect_fee`,
+        typeArguments,
+        arguments: args
+      });
+    } else {
+      tx.moveCall({
+        target: `${integrate.published_at}::${ClmmIntegratePoolV2Module}::collect_fee`,
+        typeArguments,
+        arguments: args
+      });
+    }
     return tx;
   }
   createCollectFeeNoSendPaylod(params, tx, primaryCoinAInput, primaryCoinBInput) {
@@ -6499,7 +6507,7 @@ var RewarderModule = class {
     params.rewarder_coin_types.forEach((type, index) => {
       if (tx) {
         tx.moveCall({
-          target: `${integrate.published_at}::${ClmmIntegratePoolV2Module}::collect_reward`,
+          target: this.sdk.packageOveride ? `${this.sdk.packageOveride}::cetus::collect_reward` : `${integrate.published_at}::${ClmmIntegratePoolV2Module}::collect_reward`,
           typeArguments: [...typeArguments, type],
           arguments: [
             tx.object(clmmConfigs.global_config_id),
